@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cupom Natura 👑 | A Rainha das Promoções</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --azul:#3A4BD8;
+    --tinta:#15151F;
+    --papel:#F2F1EA;
+    --amarelo:#F5C518;
+    --lilas:#A99DF5;
+    --verde:#5FD68F;
+    --rosa:#F2557C;
+    --rosa-claro:#FFD3DE;
+    --borda:2.4px solid var(--tinta);
+    --sombra-g:6px 6px 0 0 var(--tinta);
+    --sombra-m:4px 4px 0 0 var(--tinta);
+    --sombra-p:2px 2px 0 0 var(--tinta);
+    --raio:12px;
+    --raio-btn:10px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:"Space Grotesk",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background-color:var(--azul);
+    background-image:
+      linear-gradient(rgba(255,255,255,.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.09) 1px, transparent 1px);
+    background-size:30px 30px;
+    color:var(--tinta);
+    min-height:100vh;
+  }
+  a{text-decoration:none;color:inherit}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input{font-family:inherit}
+
+  .estrela{position:fixed;font-size:26px;z-index:0;pointer-events:none;opacity:.95;text-shadow:2px 2px 0 rgba(0,0,0,.25)}
+  .e1{top:9%;left:5%}.e2{top:22%;right:6%;font-size:32px}.e3{bottom:18%;left:7%}.e4{bottom:30%;right:5%;font-size:20px}
+
+  .container{max-width:560px;margin:0 auto;padding:22px 16px 40px;position:relative;z-index:1}
+
+  .janela{
+    background:var(--papel);border:var(--borda);border-radius:var(--raio);
+    box-shadow:var(--sombra-g);overflow:hidden;margin-bottom:20px;
+  }
+  .barra{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 12px;border-bottom:var(--borda);
+    font-size:13px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  }
+  .barra-lilas{background:var(--lilas)}
+  .barra-verde{background:var(--verde)}
+  .barra-amarela{background:var(--amarelo)}
+  .barra-rosa{background:var(--rosa-claro)}
+  .barra .controles{display:flex;gap:8px;align-items:center;font-weight:700;font-size:13px;opacity:.85}
+  .janela .corpo{padding:16px}
+
+  .hero-titulo{text-align:center;font-weight:700;color:var(--azul);font-size:30px;line-height:1.25;letter-spacing:.5px}
+  .marca-texto{
+    display:inline-block;background:var(--amarelo);color:var(--azul);
+    padding:2px 12px;border-radius:10px;box-shadow:3px 3px 0 0 var(--tinta);
+  }
+  .hero-sub{text-align:center;font-size:14.5px;margin-top:12px;line-height:1.5}
+  .hero-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--papel);border:var(--borda);border-radius:var(--raio-btn);
+    box-shadow:var(--sombra-m);font-size:12.5px;font-weight:700;padding:8px 12px;
+  }
+  .chip-amarelo{background:var(--amarelo)}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border:var(--borda);border-radius:var(--raio-btn);box-shadow:var(--sombra-m);
+    font-size:14px;font-weight:700;padding:11px 16px;
+    transition:transform .1s, box-shadow .1s;background:var(--papel);
+  }
+  .btn:active{transform:translate(3px,3px);box-shadow:var(--sombra-p)}
+  .btn-amarelo{background:var(--amarelo)}
+  .btn-lilas{background:var(--lilas)}
+  .btn-verde{background:var(--verde)}
+  .btn-rosa{background:var(--rosa-claro);color:#B4133F}
+  .btn-bloco{width:100%}
+  .btn-mini{padding:7px 11px;font-size:12.5px;box-shadow:var(--sombra-p)}
+  .btn-mini:active{transform:translate(2px,2px);box-shadow:none}
+
+  /* Cupom em destaque */
+  .use-cupom{font-size:28px;font-weight:700;letter-spacing:1.5px;color:var(--azul)}
+  .caixa-cupom{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    border:2.4px dashed var(--tinta);border-radius:10px;background:#fff;
+    padding:8px 8px 8px 16px;margin-top:12px;
+  }
+  .codigo-cupom{font-weight:700;font-size:20px;letter-spacing:1.5px;word-break:break-all}
+
+  /* Aviso do link */
+  .aviso-link{
+    background:var(--amarelo);border:var(--borda);border-radius:var(--raio);
+    box-shadow:var(--sombra-g);padding:14px 16px;margin-bottom:20px;
+    font-size:14.5px;font-weight:600;line-height:1.5;text-align:center;
+  }
+
+  .titulo-secao{
+    color:#fff;font-size:19px;font-weight:700;margin:6px 0 14px;
+    text-shadow:2px 2px 0 rgba(0,0,0,.3);
+  }
+
+  /* Categorias */
+  .card-categoria{
+    background:var(--papel);border:var(--borda);border-radius:var(--raio);
+    box-shadow:var(--sombra-m);overflow:hidden;margin-bottom:16px;
+  }
+  .card-categoria .barra{font-size:10.5px;padding:5px 9px}
+  .card-categoria .barra .controles{font-size:10.5px;gap:5px}
+  .card-categoria .corpo{padding:14px;display:flex;flex-direction:column;gap:9px}
+  .card-categoria .nome{font-size:17px;font-weight:700;text-align:center;line-height:1.35}
+  .btn-cupom{
+    display:block;width:100%;text-align:center;
+    border:2px dashed var(--tinta);border-radius:8px;background:#fff;
+    font-weight:700;font-size:12px;padding:8px 0;letter-spacing:.5px;
+    transition:transform .1s;
+  }
+  .btn-cupom:active{transform:scale(.97)}
+  .btn-ir{
+    display:block;text-align:center;background:var(--lilas);
+    border:var(--borda);border-radius:var(--raio-btn);box-shadow:var(--sombra-p);
+    font-size:14px;font-weight:700;padding:11px 0;
+    transition:transform .1s, box-shadow .1s;
+  }
+  .btn-ir:active{transform:translate(2px,2px);box-shadow:none}
+
+  .vazio{text-align:center;padding:36px 20px;font-size:14.5px;font-weight:500}
+  .vazio .emoji{font-size:44px;margin-bottom:12px}
+
+  .rodape{
+    text-align:center;padding:10px 16px 30px;font-size:13px;color:#fff;font-weight:600;
+    text-shadow:1px 1px 0 rgba(0,0,0,.3);position:relative;z-index:1;
+  }
+  .rodape a{text-decoration:underline;text-underline-offset:3px}
+
+  /* Admin */
+  .painel-secao{
+    background:var(--papel);border:var(--borda);border-radius:var(--raio);
+    box-shadow:var(--sombra-g);margin-bottom:20px;overflow:hidden;
+  }
+  .painel-secao .conteudo{padding:16px}
+  .campo{margin-bottom:12px}
+  .campo label{display:block;font-size:12px;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .campo input{
+    width:100%;padding:11px 12px;font-size:14px;font-weight:500;
+    border:var(--borda);border-radius:var(--raio-btn);
+    outline:none;background:#fff;color:var(--tinta);transition:box-shadow .1s;
+  }
+  .campo input:focus{box-shadow:var(--sombra-p)}
+  .campo input::placeholder{color:#999;font-weight:400}
+
+  .linha-cat{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 0;border-bottom:2px dashed #d8d6c9;
+  }
+  .linha-cat:last-child{border-bottom:none}
+  .linha-cat .nome{flex:1;font-size:13.5px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .acoes{display:flex;gap:6px;flex-shrink:0}
+  .btn-icone{
+    width:32px;height:32px;border:2px solid var(--tinta);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;background:#fff;box-shadow:var(--sombra-p);
+    transition:transform .1s, box-shadow .1s;
+  }
+  .btn-icone:active{transform:translate(2px,2px);box-shadow:none}
+  .btn-icone.perigo{background:var(--rosa-claro);color:#B4133F}
+
+  .caixa-add{background:#fff;border:2px dashed var(--tinta);border-radius:var(--raio-btn);padding:12px;margin-top:12px}
+
+  .zap-flutuante{
+    position:fixed;bottom:18px;right:14px;z-index:150;
+    display:inline-flex;align-items:center;gap:7px;
+    background:#25D366;color:var(--tinta);
+    border:2.4px solid var(--tinta);border-radius:100px;box-shadow:var(--sombra-m);
+    font-weight:700;font-size:13.5px;padding:12px 18px;
+    transition:transform .1s, box-shadow .1s;
+  }
+  .zap-flutuante:active{transform:translate(2px,2px);box-shadow:var(--sombra-p)}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);
+    background:var(--tinta);color:#fff;font-size:13.5px;font-weight:700;
+    padding:11px 20px;border-radius:100px;border:2px solid #fff;box-shadow:var(--sombra-m);
+    opacity:0;transition:all .3s;z-index:200;white-space:nowrap;
+  }
+  .toast.mostrar{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .senha-box{max-width:360px;margin:60px auto 0;padding:0 16px;position:relative;z-index:1}
+  .senha-box .corpo{text-align:center;padding:22px 18px}
+  .senha-box .cadeado{font-size:40px;margin-bottom:10px}
+  .senha-box h2{font-size:18px;font-weight:700;margin-bottom:16px}
+
+  @media(max-width:380px){.hero-titulo{font-size:25px}}
+</style>
+</head>
+<body>
+<span class="estrela e1">✨</span>
+<span class="estrela e2">⭐</span>
+<span class="estrela e3">💫</span>
+<span class="estrela e4">⭐</span>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ================================================================
+   CUPOM NATURA — A Rainha das Promoções
+   - Página:  #/
+   - Painel:  #/admin
+   Dados: documento lives/_natura no Firestore (projeto lives-da-rainha)
+   ================================================================ */
+
+const PERFIL = { nome: "A Rainha das Promoções", instagram: "@arainhadaspromocoes", emoji: "👑" };
+const ADMIN_EMAIL = "vpthais@gmail.com";
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA6qO04sAW0nPFKg_z40CRXGAC0x4E70dE",
+  authDomain: "lives-da-rainha.firebaseapp.com",
+  projectId: "lives-da-rainha",
+  storageBucket: "lives-da-rainha.firebasestorage.app",
+  messagingSenderId: "85874306516",
+  appId: "1:85874306516:web:91c45fcfcb65ed602cba41"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.firestore();
+try { db.settings({ experimentalAutoDetectLongPolling: true, merge: true }); } catch(e){}
+const auth = firebase.auth();
+const DOC = db.collection("lives").doc("_natura");
+const CORES_BARRA = ["barra-amarela","barra-verde","barra-lilas"];
+
+/* ---------- DADOS (tempo real + reservas) ---------- */
+let dados = null;            // null = carregando
+let tempoRealOk = false;
+const CHAVE_CACHE = "natura_cache_v1";
+
+function guardarCache(){
+  try { localStorage.setItem(CHAVE_CACHE, JSON.stringify(dados)); } catch(e){}
+}
+try {
+  const c = JSON.parse(localStorage.getItem(CHAVE_CACHE) || "null");
+  if (c && typeof c === "object") dados = c;
+} catch(e){}
+
+DOC.onSnapshot(function(snap){
+  tempoRealOk = true;
+  dados = snap.exists ? snap.data() : {};
+  guardarCache();
+  rota();
+}, function(err){
+  console.error(err);
+  if (dados === null) carregarViaRest();
+});
+
+function valorRest(v){
+  if (!v) return null;
+  if ("stringValue" in v) return v.stringValue;
+  if ("booleanValue" in v) return v.booleanValue;
+  if ("integerValue" in v) return Number(v.integerValue);
+  if ("doubleValue" in v) return v.doubleValue;
+  if ("nullValue" in v) return null;
+  if ("arrayValue" in v) return (v.arrayValue.values || []).map(valorRest);
+  if ("mapValue" in v) {
+    const o = {}, f = v.mapValue.fields || {};
+    for (const k in f) o[k] = valorRest(f[k]);
+    return o;
+  }
+  return null;
+}
+let buscandoRest = false;
+function carregarViaRest(){
+  if (buscandoRest || tempoRealOk) return;
+  buscandoRest = true;
+  fetch("https://firestore.googleapis.com/v1/projects/" + FIREBASE_CONFIG.projectId +
+        "/databases/(default)/documents/lives/_natura?key=" + FIREBASE_CONFIG.apiKey)
+    .then(r => r.json())
+    .then(function(j){
+      buscandoRest = false;
+      if (tempoRealOk) return;
+      const obj = {};
+      const f = j.fields || {};
+      for (const k in f) obj[k] = valorRest(f[k]);
+      dados = obj;
+      guardarCache();
+      rota();
+    })
+    .catch(function(){ buscandoRest = false; });
+}
+setTimeout(function(){ if (!tempoRealOk) carregarViaRest(); }, 5000);
+setInterval(function(){ if (!tempoRealOk && dados === null) carregarViaRest(); }, 12000);
+
+/* ---------- UTILITÁRIOS ---------- */
+function esc(t){
+  return String(t == null ? "" : t)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("mostrar");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("mostrar"), 2200);
+}
+function copiarFallback(texto){
+  const ta = document.createElement("textarea");
+  ta.value = texto; document.body.appendChild(ta);
+  ta.select(); try{ document.execCommand("copy"); toast("Copiado! 🎉"); }catch(e){ toast("Não consegui copiar 😕"); }
+  document.body.removeChild(ta);
+}
+function copiarCupom(codigo){
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(codigo).then(()=>toast("Cupom " + codigo + " copiado! 🎟️"), ()=>copiarFallback(codigo));
+  } else copiarFallback(codigo);
+}
+function controles(){ return `<span class="controles"><span>○</span><span>─</span><span>✕</span></span>`; }
+function erroEscrita(err){
+  console.error(err);
+  toast(err && err.code === "permission-denied" ? "Sem permissão — entre com a conta da Thais 🔒" : "Erro ao salvar 😕");
+}
+function salvarDoc(mudancas, msg){
+  DOC.set(mudancas, { merge: true }).then(()=>{ if (msg) toast(msg); }).catch(erroEscrita);
+}
+function categorias(){ return (dados && dados.categorias) || []; }
+
+/* ---------- SESSÃO ADMIN ---------- */
+let usuario = null;
+let authPronto = false;
+auth.onAuthStateChanged(function(u){
+  usuario = u;
+  authPronto = true;
+  if ((location.hash||"").startsWith("#/admin")) rota();
+});
+function entrarComGoogle(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(function(err){
+    if (err && (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment")) {
+      auth.signInWithRedirect(provider);
+    } else if (err && err.code !== "auth/popup-closed-by-user") {
+      console.error(err);
+      toast("Não consegui entrar 😕");
+    }
+  });
+}
+function sair(){ auth.signOut().then(()=>rota()); }
+
+/* ---------- ROTEADOR ---------- */
+function rota(){
+  const app = document.getElementById("app");
+  window.scrollTo(0,0);
+  if ((location.hash||"").startsWith("#/admin")) telaAdmin(app);
+  else telaHome(app);
+}
+window.addEventListener("hashchange", rota);
+document.addEventListener("click", function(e){
+  const a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+  if (!a) return;
+  e.preventDefault();
+  const destino = a.getAttribute("href");
+  if (location.hash === destino) rota();
+  else location.hash = destino;
+});
+
+/* ================= TELA: PÁGINA DO CUPOM ================= */
+function telaHome(app){
+  if (dados === null) {
+    app.innerHTML = `<div class="container">
+      <div class="janela"><div class="barra barra-amarela"><span>👑 ${esc(PERFIL.nome)}</span>${controles()}</div>
+      <div class="vazio"><div class="emoji">⏳</div>Carregando o cupom...</div></div></div>`;
+    return;
+  }
+  const cupom = String(dados.cupom || "").trim();
+  const cats = categorias();
+
+  const blocoCupom = cupom ? `
+      <div class="janela">
+        <div class="barra barra-verde"><span>🎟️ Cupom do dia · verificado</span>${controles()}</div>
+        <div class="corpo" style="text-align:center;padding:18px 16px">
+          <div class="use-cupom">USE O CUPOM 👇</div>
+          <div class="caixa-cupom">
+            <span class="codigo-cupom">${esc(cupom)}</span>
+            <button class="btn btn-verde btn-mini" onclick="copiarCupom('${esc(cupom)}')">Copiar</button>
+          </div>
+        </div>
+      </div>` : `
+      <div class="janela">
+        <div class="barra barra-verde"><span>🎟️ Cupom</span>${controles()}</div>
+        <div class="vazio"><div class="emoji">🔜</div>Cupom novo já já — volte em breve!</div>
+      </div>`;
+
+  const cards = cats.map((c, i) => `
+    <div class="card-categoria">
+      <div class="barra ${CORES_BARRA[i % CORES_BARRA.length]}"><span>🛍️ ${esc(PERFIL.nome)}</span>${controles()}</div>
+      <div class="corpo">
+        <div class="nome">${esc(c.nome)}</div>
+        ${cupom ? `<button class="btn-cupom" onclick="copiarCupom('${esc(cupom)}')">🎟️ Copiar cupom</button>` : ""}
+        <a class="btn-ir" href="${esc(c.url)}" target="_blank" rel="noopener">Ver ofertas ↗</a>
+      </div>
+    </div>`).join("");
+
+  app.innerHTML = `
+    <div class="container">
+      <div class="janela">
+        <div class="barra barra-lilas"><span>👑 ${esc(PERFIL.nome)}</span>${controles()}</div>
+        <div class="corpo" style="padding:24px 16px 22px">
+          <div class="hero-titulo">🌿 CUPOM<br><span class="marca-texto">NATURA</span></div>
+          <div class="hero-sub">Cupom sempre atualizado, sem pegadinha. Copie o código e escolha uma categoria aqui embaixo.</div>
+          <div class="hero-chips">
+            <a class="chip chip-amarelo" href="https://instagram.com/arainhadaspromocoes" target="_blank" rel="noopener">📸 ${esc(PERFIL.instagram)}</a>
+            <span class="chip">💚 Volte sempre!</span>
+          </div>
+        </div>
+      </div>
+
+      ${blocoCupom}
+
+      <div class="aviso-link">⚠️ O cupom funciona em <b>TODO o site da Natura</b>, mas <b>SOMENTE através do meu link!</b><br>👇 Toca numa categoria abaixo pra ativar 👇</div>
+
+      <div class="titulo-secao">🛍️ Escolha uma categoria</div>
+      ${cats.length ? cards : `
+      <div class="janela"><div class="barra barra-verde"><span>📦 Já vem</span>${controles()}</div>
+        <div class="vazio"><div class="emoji">📦</div>As categorias aparecem aqui daqui a pouco!</div></div>`}
+    </div>
+    <div class="rodape">Feito com 💚 por ${esc(PERFIL.nome)} · <a href="#/admin" title="Painel de edição">🔐</a></div>
+    ${String(dados.whatsapp||"").trim() ? `<a class="zap-flutuante" href="${esc(dados.whatsapp.trim())}" target="_blank" rel="noopener">💬 Grupo WhatsApp</a>` : ""}`;
+}
+
+/* ================= TELA: ADMIN ================= */
+let catEditando = null;
+
+function telaAdmin(app){
+  if (!authPronto || dados === null) {
+    app.innerHTML = `<div class="container">
+      <div class="janela"><div class="barra barra-amarela"><span>👑 ${esc(PERFIL.nome)}</span>${controles()}</div>
+      <div class="vazio"><div class="emoji">⏳</div>Carregando...</div></div></div>`;
+    return;
+  }
+  if (!usuario) {
+    app.innerHTML = `
+      <div class="senha-box">
+        <div class="janela">
+          <div class="barra barra-rosa"><span>🔐 Área da Rainha</span>${controles()}</div>
+          <div class="corpo">
+            <div class="cadeado">👑</div>
+            <h2>Só a Thais entra aqui!</h2>
+            <div style="font-size:13px;font-weight:500;margin-bottom:14px">Entre com a sua conta Google pra editar.</div>
+            <button class="btn btn-amarelo btn-bloco" onclick="entrarComGoogle()">Entrar com Google</button>
+            <div style="margin-top:14px"><a href="#/" style="font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px">◀ voltar pro site</a></div>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+  if (String(usuario.email||"").toLowerCase() !== ADMIN_EMAIL) {
+    app.innerHTML = `
+      <div class="senha-box">
+        <div class="janela">
+          <div class="barra barra-rosa"><span>🔐 Área da Rainha</span>${controles()}</div>
+          <div class="corpo">
+            <div class="cadeado">🚫</div>
+            <h2>Essa conta não tem permissão</h2>
+            <div style="font-size:13px;font-weight:500;margin-bottom:14px">Você entrou como <b>${esc(usuario.email)}</b>.</div>
+            <button class="btn btn-amarelo btn-bloco" onclick="sair()">Sair e trocar de conta</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const cats = categorias();
+  const linhas = cats.map(function(c, i){
+    if (catEditando === i) {
+      return `
+      <div class="caixa-add" style="margin:10px 0">
+        <div class="campo"><label>Nome da categoria</label>
+          <input id="ed-c-nome" value="${esc(c.nome)}"></div>
+        <div class="campo"><label>Link (com seu afiliado)</label>
+          <input id="ed-c-url" value="${esc(c.url)}"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-verde btn-mini" onclick="salvarEdicaoCat(${i})">💾 Salvar</button>
+          <button class="btn btn-mini" onclick="catEditando=null;rota()">Cancelar</button>
+        </div>
+      </div>`;
+    }
+    return `
+    <div class="linha-cat">
+      <div class="nome">${esc(c.nome)}</div>
+      <div class="acoes">
+        <button class="btn-icone" title="Jogar pro topo" onclick="catProTopo(${i})" style="background:var(--amarelo)">⤒</button>
+        <button class="btn-icone" title="Editar" onclick="catEditando=${i};rota()">✎</button>
+        <button class="btn-icone" title="Subir" onclick="moverCat(${i},-1)">↑</button>
+        <button class="btn-icone" title="Descer" onclick="moverCat(${i},1)">↓</button>
+        <button class="btn-icone perigo" title="Remover" onclick="removerCat(${i})">✕</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="container">
+      <div class="janela">
+        <div class="barra barra-rosa"><span>🔐 Painel Cupom Natura</span>${controles()}</div>
+        <div class="corpo" style="padding:12px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+            <div style="font-size:13px;font-weight:500">Oi, Thais! 👋</div>
+            <div style="display:flex;gap:8px">
+              <a class="btn btn-mini" href="#/">◀ Ver o site</a>
+              <button class="btn btn-mini" onclick="sair()">Sair</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel-secao">
+        <div class="barra barra-verde"><span>🎟️ Cupom ativo</span>${controles()}</div>
+        <div class="conteudo">
+          <div class="campo"><label>Código do cupom (troque quando quiser)</label>
+            <input id="cfg-cupom" value="${esc(dados.cupom || "")}" placeholder="Ex.: NATURA20 — vazio esconde o cupom" style="text-transform:uppercase"></div>
+          <button class="btn btn-amarelo btn-bloco" onclick="salvarCupom()">💾 Salvar cupom</button>
+        </div>
+      </div>
+
+      <div class="painel-secao">
+        <div class="barra barra-lilas"><span>🛍️ Categorias (${cats.length})</span>${controles()}</div>
+        <div class="conteudo">
+          ${cats.length ? linhas : `<div style="font-size:13.5px;font-weight:500">Nenhuma categoria ainda — adicione a primeira aqui embaixo. 👇</div>`}
+          <div class="caixa-add">
+            <div class="campo"><label>Nome da categoria</label>
+              <input id="nc-nome" placeholder="Ex.: Perfumaria Feminina"></div>
+            <div class="campo"><label>Link (com seu afiliado)</label>
+              <input id="nc-url" placeholder="https://..."></div>
+            <button class="btn btn-amarelo btn-bloco" onclick="adicionarCat()">Adicionar categoria ✨</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel-secao">
+        <div class="barra barra-verde"><span>💬 Grupo do WhatsApp</span>${controles()}</div>
+        <div class="conteudo">
+          <div class="campo"><label>Link do grupo (botão flutuante)</label>
+            <input id="cfg-zap" value="${esc(dados.whatsapp || "")}" placeholder="https://chat.whatsapp.com/... — vazio esconde"></div>
+          <button class="btn btn-verde btn-mini" onclick="salvarZapN()">💾 Salvar</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function salvarCupom(){
+  const cupom = (document.getElementById("cfg-cupom").value || "").trim().toUpperCase();
+  salvarDoc({ cupom, atualizadoEm: Date.now() }, cupom ? "Cupom " + cupom + " no ar! 🎟️" : "Cupom escondido 🙈");
+}
+function salvarZapN(){
+  const whatsapp = document.getElementById("cfg-zap").value.trim();
+  salvarDoc({ whatsapp }, whatsapp ? "Botão do WhatsApp salvo ✅" : "Botão escondido 🙈");
+}
+function adicionarCat(){
+  const nome = document.getElementById("nc-nome").value.trim();
+  const url = document.getElementById("nc-url").value.trim();
+  if (!nome) { toast("Dê um nome pra categoria ✍️"); return; }
+  if (!url) { toast("Cole o link 🔗"); return; }
+  salvarDoc({ categorias: categorias().concat([{ nome, url }]) }, "Categoria adicionada 🛍️");
+}
+function salvarEdicaoCat(i){
+  const nome = document.getElementById("ed-c-nome").value.trim();
+  const url = document.getElementById("ed-c-url").value.trim();
+  if (!nome) { toast("O nome não pode ficar vazio"); return; }
+  if (!url) { toast("Cole o link 🔗"); return; }
+  const cats = categorias().slice();
+  cats[i] = { nome, url };
+  catEditando = null;
+  salvarDoc({ categorias: cats }, "Categoria atualizada ✅");
+}
+function removerCat(i){
+  const cats = categorias().slice();
+  cats.splice(i, 1);
+  salvarDoc({ categorias: cats }, "Categoria removida");
+}
+function moverCat(i, dir){
+  const cats = categorias().slice();
+  const j = i + dir;
+  if (j < 0 || j >= cats.length) return;
+  const tmp = cats[i]; cats[i] = cats[j]; cats[j] = tmp;
+  salvarDoc({ categorias: cats }, null);
+}
+function catProTopo(i){
+  if (i === 0) return;
+  const cats = categorias().slice();
+  const c = cats.splice(i, 1)[0];
+  cats.unshift(c);
+  salvarDoc({ categorias: cats }, "Jogada pro topo ⤒");
+}
+
+/* ---------- INICIAR ---------- */
+rota();
+</script>
+</body>
+</html>
