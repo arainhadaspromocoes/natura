@@ -420,7 +420,7 @@ function telaHome(app){
 
   const cards = cats.map((c, i) => `
     <div class="card-categoria">
-      <div class="barra ${CORES_BARRA[i % CORES_BARRA.length]}"><span>🛍️ ${esc(PERFIL.nome)}</span>${controles()}</div>
+      <div class="barra ${CORES_BARRA[i % CORES_BARRA.length]}"><span>🛍️</span>${controles()}</div>
       <div class="corpo">
         <div class="nome">${esc(c.nome)}</div>
         ${cupom ? `<button class="btn-cupom" onclick="copiarEAbrir('${esc(cupom)}', '${esc(c.url)}')">🎟️ Copiar cupom e ir à loja</button>` : ""}
