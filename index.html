@@ -327,6 +327,20 @@ function copiarCupom(codigo){
     navigator.clipboard.writeText(codigo).then(()=>toast("Cupom " + codigo + " copiado! 🎟️"), ()=>copiarFallback(codigo));
   } else copiarFallback(codigo);
 }
+/* Copia o cupom E abre a loja na mesma hora */
+function copiarEAbrir(codigo, url){
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(codigo).catch(function(){});
+  } else {
+    try { copiarFallback(codigo); } catch(e){}
+  }
+  toast("Cupom " + codigo + " copiado! Abrindo a loja... 🛍️");
+  if (url) window.open(url, "_blank", "noopener");
+}
+function linkPadraoAtual(){
+  const cats = categorias();
+  return String((dados && dados.linkPadrao) || (cats[0] && cats[0].url) || "").trim();
+}
 function controles(){ return `<span class="controles"><span>○</span><span>─</span><span>✕</span></span>`; }
 function erroEscrita(err){
   console.error(err);
@@ -393,8 +407,9 @@ function telaHome(app){
           <div class="use-cupom">USE O CUPOM 👇</div>
           <div class="caixa-cupom">
             <span class="codigo-cupom">${esc(cupom)}</span>
-            <button class="btn btn-verde btn-mini" onclick="copiarCupom('${esc(cupom)}')">Copiar</button>
+            <button class="btn btn-verde btn-mini" onclick="copiarEAbrir('${esc(cupom)}', '${esc(linkPadraoAtual())}')">Copiar</button>
           </div>
+          <div style="font-size:12px;font-weight:600;margin-top:8px;opacity:.75">Ao copiar, a loja já abre com o meu link ✅</div>
         </div>
       </div>` : `
       <div class="janela">
@@ -407,7 +422,7 @@ function telaHome(app){
       <div class="barra ${CORES_BARRA[i % CORES_BARRA.length]}"><span>🛍️ ${esc(PERFIL.nome)}</span>${controles()}</div>
       <div class="corpo">
         <div class="nome">${esc(c.nome)}</div>
-        ${cupom ? `<button class="btn-cupom" onclick="copiarCupom('${esc(cupom)}')">🎟️ Copiar cupom</button>` : ""}
+        ${cupom ? `<button class="btn-cupom" onclick="copiarEAbrir('${esc(cupom)}', '${esc(c.url)}')">🎟️ Copiar cupom e ir à loja</button>` : ""}
         <a class="btn-ir" href="${esc(c.url)}" target="_blank" rel="noopener">Ver ofertas ↗</a>
       </div>
     </div>`).join("");
@@ -534,6 +549,8 @@ function telaAdmin(app){
         <div class="conteudo">
           <div class="campo"><label>Código do cupom (troque quando quiser)</label>
             <input id="cfg-cupom" value="${esc(dados.cupom || "")}" placeholder="Ex.: NATURA20 — vazio esconde o cupom" style="text-transform:uppercase"></div>
+          <div class="campo"><label>Link que abre ao copiar o cupom lá de cima (ex.: promoções)</label>
+            <input id="cfg-linkpadrao" value="${esc(dados.linkPadrao || "")}" placeholder="Vazio usa o link da 1ª categoria"></div>
           <button class="btn btn-amarelo btn-bloco" onclick="salvarCupom()">💾 Salvar cupom</button>
         </div>
       </div>
@@ -565,7 +582,8 @@ function telaAdmin(app){
 
 function salvarCupom(){
   const cupom = (document.getElementById("cfg-cupom").value || "").trim().toUpperCase();
-  salvarDoc({ cupom, atualizadoEm: Date.now() }, cupom ? "Cupom " + cupom + " no ar! 🎟️" : "Cupom escondido 🙈");
+  const linkPadrao = document.getElementById("cfg-linkpadrao").value.trim();
+  salvarDoc({ cupom, linkPadrao, atualizadoEm: Date.now() }, cupom ? "Cupom " + cupom + " no ar! 🎟️" : "Cupom escondido 🙈");
 }
 function salvarZapN(){
   const whatsapp = document.getElementById("cfg-zap").value.trim();
