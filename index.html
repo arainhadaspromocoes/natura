@@ -102,11 +102,14 @@
   .codigo-cupom{font-weight:700;font-size:20px;letter-spacing:1.5px;word-break:break-all}
 
   /* Aviso do link */
-  .aviso-link{
-    background:var(--amarelo);border:var(--borda);border-radius:var(--raio);
-    box-shadow:var(--sombra-g);padding:14px 16px;margin-bottom:20px;
-    font-size:14.5px;font-weight:600;line-height:1.5;text-align:center;
+  .aviso-texto{
+    font-size:17px;font-weight:700;line-height:1.55;text-align:center;
   }
+  .aviso-texto .destaque{
+    background:var(--rosa);color:#fff;padding:1px 8px;border-radius:8px;
+    box-shadow:2px 2px 0 0 var(--tinta);white-space:nowrap;
+  }
+  .aviso-sub{font-size:13.5px;font-weight:600;text-align:center;margin-top:10px;opacity:.85}
 
   .titulo-secao{
     color:#fff;font-size:19px;font-weight:700;margin:6px 0 14px;
@@ -414,25 +417,30 @@ function telaHome(app){
       <div class="janela">
         <div class="barra barra-lilas"><span>👑 ${esc(PERFIL.nome)}</span>${controles()}</div>
         <div class="corpo" style="padding:24px 16px 22px">
-          <div class="hero-titulo">🌿 CUPOM<br><span class="marca-texto">NATURA</span></div>
-          <div class="hero-sub">Cupom sempre atualizado, sem pegadinha. Copie o código e escolha uma categoria aqui embaixo.</div>
-          <div class="hero-chips">
-            <a class="chip chip-amarelo" href="https://instagram.com/arainhadaspromocoes" target="_blank" rel="noopener">📸 ${esc(PERFIL.instagram)}</a>
-            <span class="chip">💚 Volte sempre!</span>
-          </div>
+          <div class="hero-titulo">🌿 CUPOM <span class="marca-texto">NATURA</span></div>
+          <div class="hero-sub">Cupom sempre atualizado. Copie o código e escolha uma categoria aqui embaixo.</div>
+        </div>
+      </div>
+
+      <div class="janela">
+        <div class="barra barra-rosa"><span>‼️ Atenção</span>${controles()}</div>
+        <div class="corpo" style="padding:18px 16px">
+          <div class="aviso-texto">⚠️ O cupom funciona em todo o site da Natura e da Avon, <span class="destaque">somente através do meu link!</span></div>
+          <div class="aviso-sub">👇 Toca numa categoria abaixo pra ativar 👇</div>
         </div>
       </div>
 
       ${blocoCupom}
-
-      <div class="aviso-link">⚠️ O cupom funciona em <b>TODO o site da Natura</b>, mas <b>SOMENTE através do meu link!</b><br>👇 Toca numa categoria abaixo pra ativar 👇</div>
 
       <div class="titulo-secao">🛍️ Escolha uma categoria</div>
       ${cats.length ? cards : `
       <div class="janela"><div class="barra barra-verde"><span>📦 Já vem</span>${controles()}</div>
         <div class="vazio"><div class="emoji">📦</div>As categorias aparecem aqui daqui a pouco!</div></div>`}
     </div>
-    <div class="rodape">Feito com 💚 por ${esc(PERFIL.nome)} · <a href="#/admin" title="Painel de edição">🔐</a></div>
+    <div class="rodape">
+      <a class="chip chip-amarelo" style="text-shadow:none;color:var(--tinta)" href="https://instagram.com/arainhadaspromocoes" target="_blank" rel="noopener">📸 ${esc(PERFIL.instagram)}</a>
+      <div style="margin-top:14px">Feito com 💚 por ${esc(PERFIL.nome)} · <a href="#/admin" title="Painel de edição">🔐</a></div>
+    </div>
     ${String(dados.whatsapp||"").trim() ? `<a class="zap-flutuante" href="${esc(dados.whatsapp.trim())}" target="_blank" rel="noopener">💬 Grupo WhatsApp</a>` : ""}`;
 }
 
