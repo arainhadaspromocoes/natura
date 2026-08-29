@@ -120,7 +120,9 @@
   .card-categoria{
     background:var(--papel);border:var(--borda);border-radius:var(--raio);
     box-shadow:var(--sombra-m);overflow:hidden;margin-bottom:16px;
+    cursor:pointer;transition:transform .1s;
   }
+  .card-categoria:active{transform:scale(.98)}
   .card-categoria .barra{font-size:10.5px;padding:5px 9px}
   .card-categoria .barra .controles{font-size:10.5px;gap:5px}
   .card-categoria .corpo{padding:14px;display:flex;flex-direction:column;gap:9px}
@@ -338,6 +340,12 @@ function copiarEAbrir(codigo, url){
   toast("Cupom " + codigo + " copiado! Abrindo a loja... 🛍️");
   if (url) window.open(url, "_blank", "noopener");
 }
+/* Card inteiro clicável: copia o cupom (se houver) e abre a categoria */
+function abrirCategoria(url){
+  const cupom = String((dados && dados.cupom) || "").trim();
+  if (cupom) copiarEAbrir(cupom, url);
+  else if (url) window.open(url, "_blank", "noopener");
+}
 function linkPadraoAtual(){
   const cats = categorias();
   return String((dados && dados.linkPadrao) || (cats[0] && cats[0].url) || "").trim();
@@ -419,12 +427,12 @@ function telaHome(app){
       </div>`;
 
   const cards = cats.map((c, i) => `
-    <div class="card-categoria">
+    <div class="card-categoria" onclick="abrirCategoria('${esc(c.url)}')">
       <div class="barra ${CORES_BARRA[i % CORES_BARRA.length]}"><span>🛍️</span>${controles()}</div>
       <div class="corpo">
         <div class="nome">${esc(c.nome)}</div>
-        ${cupom ? `<button class="btn-cupom" onclick="copiarEAbrir('${esc(cupom)}', '${esc(c.url)}')">🎟️ Copiar cupom e ir à loja</button>` : ""}
-        <a class="btn-ir" href="${esc(c.url)}" target="_blank" rel="noopener">Ver ofertas ↗</a>
+        ${cupom ? `<span class="btn-cupom">🎟️ Copiar cupom e ir à loja</span>` : ""}
+        <span class="btn-ir">Ver ofertas ↗</span>
       </div>
     </div>`).join("");
 
