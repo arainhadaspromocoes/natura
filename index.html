@@ -210,9 +210,34 @@
   .senha-box h2{font-size:18px;font-weight:700;margin-bottom:16px}
 
   @media(max-width:380px){.hero-titulo{font-size:25px}}
+
+  /* ===== ABAS DO REINO (navegação entre os sites) ===== */
+  .abas-reino{
+    position:sticky;top:0;z-index:60;display:flex;gap:8px;
+    justify-content:flex-start;overflow-x:auto;padding:10px 12px;
+    background:#15151F;box-shadow:0 2px 0 rgba(0,0,0,.35);
+    scrollbar-width:none;
+  }
+  .abas-reino::-webkit-scrollbar{display:none}
+  .abas-reino a{
+    flex:0 0 auto;font-size:13px;font-weight:700;padding:7px 13px;
+    border-radius:999px;color:#F2F1EA;white-space:nowrap;text-decoration:none;
+    border:2px solid rgba(242,241,234,.25);
+  }
+  .abas-reino a.atual{
+    background:#F5C518;color:#15151F;border-color:#15151F;
+    box-shadow:2px 2px 0 rgba(0,0,0,.45);
+  }
+  @media (min-width:600px){ .abas-reino{justify-content:center} }
 </style>
 </head>
 <body>
+<nav class="abas-reino">
+  <a href="https://arainhadaspromocoes.github.io/">🎟️ Cupons ML</a>
+  <a href="https://arainhadaspromocoes.github.io/natura/" class="atual">🌿 Natura</a>
+  <a href="https://arainhadaspromocoes.github.io/lives/">🔴 Lives</a>
+  <a href="https://arainhadaspromocoes.github.io/blog/">📰 Blog</a>
+</nav>
 <span class="estrela e1">✨</span>
 <span class="estrela e2">⭐</span>
 <span class="estrela e3">💫</span>
