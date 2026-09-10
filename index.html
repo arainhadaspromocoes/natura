@@ -663,5 +663,103 @@ function catProTopo(i){
 /* ---------- INICIAR ---------- */
 rota();
 </script>
+<!-- ===== catraca da Rainha: conta visitas e quem está online ===== -->
+<script>
+(function(){
+  var PROJ = "lives-da-rainha";
+  var KEY  = "AIzaSyA6qO04sAW0nPFKg_z40CRXGAC0x4E70dE";
+  var RAIZ = "projects/" + PROJ + "/databases/(default)/documents";
+  var COMMIT = "https://firestore.googleapis.com/v1/" + RAIZ + ":commit?key=" + KEY;
+  var vivo = null, meuId = null, minhaPag = "site", ligado = false;
+
+  function pular(){
+    try { return localStorage.getItem("rainha_naocontar") === "1"; } catch(e){ return false; }
+  }
+  function limpar(k){
+    return String(k || "site").replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 100) || "site";
+  }
+  function diaHoje(){
+    var d = new Date(), m = d.getMonth() + 1, x = d.getDate();
+    return "d_" + d.getFullYear() + (m < 10 ? "0" : "") + m + (x < 10 ? "0" : "") + x;
+  }
+  function mandar(corpo){
+    try {
+      return fetch(COMMIT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(corpo)
+      }).catch(function(){});
+    } catch(e){}
+  }
+  function idSessao(){
+    try {
+      var s = sessionStorage.getItem("rainha_sid");
+      if (!s){
+        s = "v" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        sessionStorage.setItem("rainha_sid", s);
+      }
+      return s;
+    } catch(e){ return "v" + Math.random().toString(36).slice(2, 10); }
+  }
+
+  /* conta 1 visita por aba/sessão em cada página */
+  function contarVisita(chave){
+    if (pular()) return;
+    var k = limpar(chave);
+    try {
+      if (sessionStorage.getItem("rainha_visto_" + k)) return;
+      sessionStorage.setItem("rainha_visto_" + k, "1");
+    } catch(e){}
+    mandar({ writes: [{
+      update: { name: RAIZ + "/visitas/" + k, fields: {} },
+      updateMask: { fieldPaths: ["__vazio__"] },
+      updateTransforms: [
+        { fieldPath: "total",   increment: { integerValue: "1" } },
+        { fieldPath: diaHoje(), increment: { integerValue: "1" } },
+        { fieldPath: "ultima",  setToServerValue: "REQUEST_TIME" }
+      ]
+    }]});
+  }
+
+  /* presença: bate ponto a cada ~55s enquanto a aba estiver aberta */
+  function baterPonto(){
+    if (pular() || !meuId) return;
+    mandar({ writes: [{
+      update: { name: RAIZ + "/online/" + meuId, fields: { p: { stringValue: minhaPag } } },
+      updateTransforms: [{ fieldPath: "t", setToServerValue: "REQUEST_TIME" }]
+    }]});
+  }
+  function sairDoAr(){
+    if (!meuId) return;
+    var corpo = JSON.stringify({ writes: [{ "delete": RAIZ + "/online/" + meuId }] });
+    try {
+      if (navigator.sendBeacon){
+        navigator.sendBeacon(COMMIT, new Blob([corpo], { type: "application/json" }));
+        return;
+      }
+    } catch(e){}
+    mandar({ writes: [{ "delete": RAIZ + "/online/" + meuId }] });
+  }
+  function marcarPresenca(pagina){
+    if (pular()) return;
+    minhaPag = limpar(pagina);
+    meuId = idSessao();
+    baterPonto();
+    if (vivo) clearInterval(vivo);
+    vivo = setInterval(function(){ if (!document.hidden) baterPonto(); }, 55000);
+    if (!ligado){
+      ligado = true;
+      window.addEventListener("pagehide", sairDoAr);
+      document.addEventListener("visibilitychange", function(){ if (!document.hidden) baterPonto(); });
+    }
+  }
+
+  window.chaveHoje = diaHoje;
+  window.contarVisita = contarVisita;
+  window.marcarPresenca = marcarPresenca;
+  window.registrarPagina = function(chave){ contarVisita(chave); marcarPresenca(chave); };
+})();
+</script>
+<script>registrarPagina("natura");</script>
 </body>
 </html>
