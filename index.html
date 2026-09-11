@@ -712,7 +712,7 @@ rota();
     } catch(e){}
     mandar({ writes: [{
       update: { name: RAIZ + "/visitas/" + k, fields: {} },
-      updateMask: { fieldPaths: ["__vazio__"] },
+      updateMask: { fieldPaths: ["marcador"] },
       updateTransforms: [
         { fieldPath: "total",   increment: { integerValue: "1" } },
         { fieldPath: diaHoje(), increment: { integerValue: "1" } },
